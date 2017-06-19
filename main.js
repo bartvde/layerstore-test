@@ -80,7 +80,7 @@ fetch('wms.json')
   var map = apply('map', 'wms.json');
   map.on('moveend', function(evt) {
     var view = evt.target.getView();
-    var center = proj.toLonLat(view.getCenter(), view.getProjection().getCode());
+    var center = proj.toLonLat(view.getCenter(), view.getProjection());
     store.dispatch(setCenter(center));
   });
 }).catch(function(ex) {
