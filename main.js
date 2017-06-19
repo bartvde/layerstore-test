@@ -32,9 +32,18 @@ const layers = (state = [], action) => {
   } 
 };
 
+const center = (state = [0, 0], action) => {
+  switch (action.type) {
+    case 'SET_CENTER':
+      return action.center;
+    default:
+      return state;
+  }
+};
+
 const layersApp = combineReducers({
-  map,
-  layers
+  layers,
+  center
 });
 
 // action creators
@@ -45,6 +54,13 @@ function removeLayer(layer) {
   };
 }
 
+function setCenter(center) {
+  return {
+    type: 'SET_CENTER',
+    center
+  };
+}
+
 //const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 fetch('wms.json')
@@ -52,6 +68,7 @@ fetch('wms.json')
   return response.json()
 }).then(function(json) {
   const store = createStore(layersApp, json);
+  global.store = store;
   ReactDOM.render(
     <Provider store={store}>
       <div>
@@ -60,7 +77,12 @@ fetch('wms.json')
       </div>
     </Provider>
   , document.getElementById('map'));
-  apply('map', 'wms.json');
+  var map = apply('map', 'wms.json');
+  map.on('moveend', function(evt) {
+    var view = evt.target.getView();
+    var center = proj.toLonLat(view.getCenter(), view.getProjection().getCode());
+    store.dispatch(setCenter(center));
+  });
 }).catch(function(ex) {
   console.log('parsing failed', ex)
 });
@@ -73,7 +95,6 @@ let LayerList = ( {layers, onRemove} ) => {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     layers: state.layers
   };
