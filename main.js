@@ -19,11 +19,8 @@ import uuid from 'uuid';
 
 import { apply } from 'ol-mapbox-style';
 
-// reducer
 const layers = (state = [], action) => {
   switch (action.type) {
-    case 'ADD_LAYERS':
-      return state.concat(action.layers);
     case 'REMOVE_LAYER':
       const index = state.indexOf(action.layer);
       return [
@@ -36,17 +33,11 @@ const layers = (state = [], action) => {
 };
 
 const layersApp = combineReducers({
+  map,
   layers
 });
 
-// action creator
-function addLayers(layers) {
-  return {
-    type: 'ADD_LAYERS',
-    layers
-  };
-}
-
+// action creators
 function removeLayer(layer) {
   return {
     type: 'REMOVE_LAYER',
@@ -54,14 +45,22 @@ function removeLayer(layer) {
   };
 }
 
-const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+//const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 fetch('wms.json')
   .then(function(response) {
   return response.json()
 }).then(function(json) {
+  const store = createStore(layersApp, json);
+  ReactDOM.render(
+    <Provider store={store}>
+      <div>
+        <LayerList />
+        <MapSync />
+      </div>
+    </Provider>
+  , document.getElementById('map'));
   apply('map', 'wms.json');
-  store.dispatch(addLayers(json.layers));
 }).catch(function(ex) {
   console.log('parsing failed', ex)
 });
@@ -74,6 +73,7 @@ let LayerList = ( {layers, onRemove} ) => {
 }
 
 const mapStateToProps = (state) => {
+  console.log(state);
   return {
     layers: state.layers
   };
@@ -85,12 +85,16 @@ const mapDispatchToProps = (dispatch) => ({
   }
 });
 
-LayerList = connect(mapStateToProps, mapDispatchToProps)(LayerList);
+class MapSync extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    // TODO update map
+    console.log(nextProps);
+  }
+  render() {
+    return (<div/>);
+  }
+}
 
-ReactDOM.render(
-  <Provider store={store}>
-    <div>
-      <LayerList />
-    </div>
-  </Provider>
-, document.getElementById('map'));
+MapSync = connect(mapStateToProps)(MapSync);
+
+LayerList = connect(mapStateToProps, mapDispatchToProps)(LayerList);
