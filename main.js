@@ -23,8 +23,13 @@ import { apply } from 'ol-mapbox-style';
 const layers = (state = [], action) => {
   switch (action.type) {
     case 'ADD_LAYERS':
-      console.log(action.layers);
       return state.concat(action.layers);
+    case 'REMOVE_LAYER':
+      const index = state.indexOf(action.layer);
+      return [
+        ...state.slice(0, index),
+        ...state.slice(index + 1)
+      ];
     default:
       return state;
   } 
@@ -42,6 +47,13 @@ function addLayers(layers) {
   };
 }
 
+function removeLayer(layer) {
+  return {
+    type: 'REMOVE_LAYER',
+    layer
+  };
+}
+
 const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 fetch('wms.json')
@@ -54,9 +66,31 @@ fetch('wms.json')
   console.log('parsing failed', ex)
 });
 
+let LayerList = ( {layers, onRemove} ) => {
+  var items = layers.map((layer, idx) => {
+    return (<li key={idx}>{layer.id}<button onClick={onRemove.bind(this, layer)}>Remove</button></li>);
+  });
+  return (<ul>{items}</ul>);
+}
+
+const mapStateToProps = (state) => {
+  return {
+    layers: state.layers
+  };
+}
+
+const mapDispatchToProps = (dispatch) => ({
+  onRemove(layer) {
+    dispatch(removeLayer(layer));
+  }
+});
+
+LayerList = connect(mapStateToProps, mapDispatchToProps)(LayerList);
+
 ReactDOM.render(
   <Provider store={store}>
     <div>
+      <LayerList />
     </div>
   </Provider>
 , document.getElementById('map'));
