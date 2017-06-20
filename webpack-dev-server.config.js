@@ -28,6 +28,11 @@ const config = {
     // Enables Hot Modules Replacement
     new webpack.HotModuleReplacementPlugin(),
   ],
+  resolve: {
+    alias: {
+      ol: path.resolve(__dirname, 'node_modules/ol')
+    }
+  },
   module: {
     rules: [
       {
