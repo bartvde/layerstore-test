@@ -19,10 +19,24 @@ import uuid from 'uuid';
 
 import { apply } from 'ol-mapbox-style';
 
+const context = 'camo3d.json'
+
+// the openlayers map
+let map;
+
 const layers = (state = [], action) => {
+  let index;
   switch (action.type) {
+    case 'TOGGLE_LAYER_VISIBILITY':
+      index = state.indexOf(action.layer);
+      var visible = action.layer.layout ? action.layer.layout.visibility : 'visible';
+      return [
+        ...state.slice(0, index),
+        Object.assign({}, state[index], {layout: Object.assign({}, state[index].layout, {visibility: visible === 'visible' ? 'none' : 'visible'})}),
+        ...state.slice(index + 1)
+      ];
     case 'REMOVE_LAYER':
-      const index = state.indexOf(action.layer);
+      index = state.indexOf(action.layer);
       return [
         ...state.slice(0, index),
         ...state.slice(index + 1)
@@ -54,6 +68,13 @@ function removeLayer(layer) {
   };
 }
 
+function toggleVisiblity(layer) {
+  return {
+    type: 'TOGGLE_LAYER_VISIBILITY',
+    layer
+  };
+}
+
 function setCenter(center) {
   return {
     type: 'SET_CENTER',
@@ -63,7 +84,7 @@ function setCenter(center) {
 
 //const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
-fetch('wms.json')
+fetch(context)
   .then(function(response) {
   return response.json()
 }).then(function(json) {
@@ -76,8 +97,8 @@ fetch('wms.json')
         <MapSync />
       </div>
     </Provider>
-  , document.getElementById('map'));
-  var map = apply('map', 'wms.json');
+  , document.getElementById('layerlist'));
+  map = apply('map', context);
   map.on('moveend', function(evt) {
     var view = evt.target.getView();
     var center = proj.toLonLat(view.getCenter(), view.getProjection());
@@ -87,9 +108,9 @@ fetch('wms.json')
   console.log('parsing failed', ex)
 });
 
-let LayerList = ( {layers, onRemove} ) => {
+let LayerList = ( {layers, onRemove, onToggle} ) => {
   var items = layers.map((layer, idx) => {
-    return (<li key={idx}>{layer.id}<button onClick={onRemove.bind(this, layer)}>Remove</button></li>);
+    return (<li key={idx}><input type='checkbox' onChange={onToggle.bind(this, layer)} checked={layer.layout ? layer.layout.visibility === 'visible' : true}/>{layer.id}<button onClick={onRemove.bind(this, layer)}>Remove</button></li>);
   });
   return (<ul>{items}</ul>);
 }
@@ -103,6 +124,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   onRemove(layer) {
     dispatch(removeLayer(layer));
+  },
+  onToggle(layer) {
+    dispatch(toggleVisiblity(layer));
   }
 });
 
