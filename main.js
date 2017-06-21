@@ -7,6 +7,7 @@ import View from 'ol/view';
 import TileLayer from 'ol/layer/tile';
 import XYZ from 'ol/source/xyz';
 import VectorLayer from 'ol/layer/vector';
+import VectorTileLayer from 'ol/layer/vectortile';
 import VectorSource from 'ol/source/vector';
 import GeoJSONFormat from 'ol/format/geojson';
 import Style from 'ol/style/style';
@@ -17,7 +18,7 @@ import proj from 'ol/proj';
 
 import uuid from 'uuid';
 
-import { apply } from 'ol-mapbox-style';
+import { apply, applyStyle } from 'ol-mapbox-style';
 
 const context = 'camo3d.json'
 
@@ -170,7 +171,9 @@ fetch(context)
 
 let LayerList = ( {layers, onRemove, onToggle} ) => {
   var items = layers.map((layer, idx) => {
-    return (<li key={idx}><input type='checkbox' onChange={onToggle.bind(this, layer)} checked={layer.layout ? layer.layout.visibility === 'visible' : true}/>{layer.id}<button onClick={onRemove.bind(this, layer)}>Remove</button></li>);
+    if (layer.type !== "background") {
+      return (<li key={idx}><input type='checkbox' onChange={onToggle.bind(this, layer)} checked={layer.layout ? layer.layout.visibility === 'visible' : true}/>{layer.id}<button onClick={onRemove.bind(this, layer)}>Remove</button></li>);
+    }
   });
   return (<ul>{items}</ul>);
 }
@@ -192,8 +195,14 @@ const mapDispatchToProps = (dispatch) => ({
 
 class MapSync extends React.Component {
   componentWillReceiveProps(nextProps) {
-    map.getLayers().clear();
-    apply(map, store.getState());
+    //map.getLayers().clear();
+    //apply(map, store.getState());
+    map.getLayers().forEach(function(lyr) {
+      if (lyr instanceof VectorTileLayer) {
+        // TODO do not hard-code source id
+        applyStyle(lyr, store.getState(), 'tegola-osm');
+      }
+    });
   }
   render() {
     return (<div/>);
