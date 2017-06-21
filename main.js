@@ -75,6 +75,34 @@ const glyphs = (state = null, action) => {
   return state;
 };
 
+const name = (state = '', action) => {
+  return state;
+};
+
+const metadata = (state = {}, action) => {
+  return state;
+};
+
+const bearing = (state = 0, action) => {
+  return state;
+};
+
+const pitch = (state = 0, action) => {
+  return state;
+};
+
+const created = (state = '', action) => {
+  return state;
+};
+
+const id = (state = '', action) => {
+  return id;
+};
+
+const owner = (state = '', action) => {
+  return state;
+};
+
 const layersApp = combineReducers({
   layers,
   center,
@@ -82,7 +110,14 @@ const layersApp = combineReducers({
   version,
   sprite,
   glyphs,
-  zoom
+  zoom,
+  name,
+  metadata,
+  bearing,
+  pitch,
+  created,
+  id,
+  owner
 });
 
 // action creators
