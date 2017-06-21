@@ -55,9 +55,34 @@ const center = (state = [0, 0], action) => {
   }
 };
 
+const zoom = (state = 0, action) => {
+  return state;
+};
+
+const sources = (state = {}, action) => {
+  return state;
+};
+
+const version = (state = 8, action) => {
+  return state;
+};
+
+const sprite = (state = null, action) => {
+  return state;
+};
+
+const glyphs = (state = null, action) => {
+  return state;
+};
+
 const layersApp = combineReducers({
   layers,
-  center
+  center,
+  sources,
+  version,
+  sprite,
+  glyphs,
+  zoom
 });
 
 // action creators
@@ -98,7 +123,7 @@ fetch(context)
       </div>
     </Provider>
   , document.getElementById('layerlist'));
-  map = apply('map', context);
+  map = apply('map', json);
   map.on('moveend', function(evt) {
     var view = evt.target.getView();
     var center = proj.toLonLat(view.getCenter(), view.getProjection());
@@ -132,8 +157,8 @@ const mapDispatchToProps = (dispatch) => ({
 
 class MapSync extends React.Component {
   componentWillReceiveProps(nextProps) {
-    // TODO update map
-    console.log(nextProps);
+    map.getLayers().clear();
+    apply(map, store.getState());
   }
   render() {
     return (<div/>);

@@ -1,7 +1,7 @@
 {
-  "name": "redux-featurestore",
+  "name": "redux-layerstore",
   "version": "0.0.1",
-  "description": "Testing FeatureStore using redux",
+  "description": "Testing LayerStore using redux",
   "scripts": {
     "start": "webpack-dev-server --config webpack-dev-server.config.js",
     "build": "webpack --config webpack.config.js"
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "ol": "^4.2.0",
-    "ol-mapbox-style": "^2.4.0",
+    "ol-mapbox-style": "^2.5.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-redux": "^5.0.5",
