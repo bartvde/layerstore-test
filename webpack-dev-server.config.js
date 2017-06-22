@@ -32,17 +32,19 @@ const config = {
     alias: {
       ol: path.resolve(__dirname, 'node_modules/ol'),
       'mapbox-to-ol-style': path.resolve(__dirname, 'node_modules/mapbox-to-ol-style')
-    }
+    },
+    extensions: [".js", ".json", ".jsx"],
+    modules: ['node_modules', path.resolve(__dirname, 'node_modules/maputnik/src/components/layers')]
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules\/(?!(maputnik)\/).*/,
         loader: 'babel-loader',
         query: {
           cacheDirectory: true,
-        },
+        }
       }, {
         test: /\.css$/,
         loader: "style-loader!css-loader"

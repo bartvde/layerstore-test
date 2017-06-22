@@ -14,6 +14,7 @@ import Style from 'ol/style/style';
 import CircleStyle from 'ol/style/circle';
 import FillStyle from 'ol/style/fill';
 import SelectInteraction from 'ol/interaction/select';
+import LayerEditor from 'maputnik/src/components/layers/LayerEditor.jsx';
 import proj from 'ol/proj';
 
 import uuid from 'uuid';
