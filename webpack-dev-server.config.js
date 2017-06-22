@@ -30,7 +30,8 @@ const config = {
   ],
   resolve: {
     alias: {
-      ol: path.resolve(__dirname, 'node_modules/ol')
+      ol: path.resolve(__dirname, 'node_modules/ol'),
+      'mapbox-to-ol-style': path.resolve(__dirname, 'node_modules/mapbox-to-ol-style')
     }
   },
   module: {
