@@ -166,10 +166,6 @@ function setCenter(center) {
 
 //const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
-const onLayerChanged = (layer) => {
-  console.log(layer);
-};
-
 fetch(context)
   .then(function(response) {
   return response.json()
@@ -236,7 +232,6 @@ class MapSync extends React.Component {
     map.getLayers().forEach(function(lyr) {
       if (lyr instanceof VectorTileLayer) {
         // TODO do not hard-code source id
-console.log(store.getState());
         applyStyle(lyr, store.getState(), 'tegola-osm');
       }
     });
