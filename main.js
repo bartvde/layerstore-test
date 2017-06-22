@@ -16,6 +16,7 @@ import FillStyle from 'ol/style/fill';
 import SelectInteraction from 'ol/interaction/select';
 import LayerEditor from 'maputnik/src/components/layers/LayerEditor.jsx';
 import proj from 'ol/proj';
+import GlSpec from '@mapbox/mapbox-gl-style-spec/reference/latest.js'
 
 import uuid from 'uuid';
 
@@ -41,6 +42,18 @@ const layers = (state = [], action) => {
       index = state.indexOf(action.layer);
       return [
         ...state.slice(0, index),
+        ...state.slice(index + 1)
+      ];
+    case 'CHANGE_LAYER_STYLE':
+      for (var i = 0, ii = state.length; i < ii; ++i) {
+        if (state[i].id === action.layer.id) {
+          index = i;
+          break;
+        }
+      }
+      return [
+        ...state.slice(0, index),
+        action.layer,
         ...state.slice(index + 1)
       ];
     default:
@@ -130,6 +143,13 @@ function removeLayer(layer) {
   };
 }
 
+function changeStyle(layer) {
+  return {
+    type: 'CHANGE_LAYER_STYLE',
+    layer
+  };
+}
+
 function toggleVisiblity(layer) {
   return {
     type: 'TOGGLE_LAYER_VISIBILITY',
@@ -146,16 +166,31 @@ function setCenter(center) {
 
 //const store = createStore(layersApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
+const onLayerChanged = (layer) => {
+  console.log(layer);
+};
+
 fetch(context)
   .then(function(response) {
   return response.json()
 }).then(function(json) {
   const store = createStore(layersApp, json);
   global.store = store;
+  const state = store.getState();
   ReactDOM.render(
     <Provider store={store}>
       <div>
         <LayerList />
+        <LayerEditor
+      layer={state.layers[0]}
+      sources={{}}
+      vectorLayers={{}}
+      spec={GlSpec}
+      onLayerChanged={function(layer) {
+        store.dispatch(changeStyle(layer));
+      }}
+      /*onLayerIdChange={this.onLayerIdChange.bind(this)}*/
+    />
         <MapSync />
       </div>
     </Provider>
@@ -201,6 +236,7 @@ class MapSync extends React.Component {
     map.getLayers().forEach(function(lyr) {
       if (lyr instanceof VectorTileLayer) {
         // TODO do not hard-code source id
+console.log(store.getState());
         applyStyle(lyr, store.getState(), 'tegola-osm');
       }
     });
