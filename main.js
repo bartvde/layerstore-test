@@ -177,16 +177,7 @@ fetch(context)
     <Provider store={store}>
       <div>
         <LayerList />
-        <LayerEditor
-      layer={state.layers[0]}
-      sources={{}}
-      vectorLayers={{}}
-      spec={GlSpec}
-      onLayerChanged={function(layer) {
-        store.dispatch(changeStyle(layer));
-      }}
-      /*onLayerIdChange={this.onLayerIdChange.bind(this)}*/
-    />
+        <LayerEditorContainer sources={{}} vectorLayers={{}} spec={GlSpec} />
         <MapSync />
       </div>
     </Provider>
@@ -242,5 +233,19 @@ class MapSync extends React.Component {
 }
 
 MapSync = connect(mapStateToProps)(MapSync);
+
+const mapLayerEditorStateToProps = (state) => {
+  return {
+    layer: state.layers[0]
+  };
+}
+
+const mapLayerEditorDispatchToProps = (dispatch) => ({
+  onLayerChanged(layer) {
+    dispatch(changeStyle(layer));
+  }
+});
+
+const LayerEditorContainer = connect(mapLayerEditorStateToProps, mapLayerEditorDispatchToProps)(LayerEditor);
 
 LayerList = connect(mapStateToProps, mapDispatchToProps)(LayerList);
